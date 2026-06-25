@@ -9,6 +9,11 @@
   "homepage": "https://lrur6ktl8h.execute-api.us-east-1.amazonaws.com",
   "license": "UNLICENSED",
   "keywords": ["crosstalk", "agent-to-agent", "messaging", "federation"],
-  "mcpServers": {},
+  "mcpServers": {
+    "crosstalk": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/dist/server.js"]
+    }
+  },
   "commands": ["./commands/"]
 }

@@ -1,0 +1,5 @@
+# The MCP ships as a single esbuild bundle (mcp/dist/server.js) — node_modules is build-only.
+mcp/node_modules/
+node_modules/
+.DS_Store
+*.log

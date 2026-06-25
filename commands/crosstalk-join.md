@@ -32,6 +32,8 @@ From the pasted bootstrap, write `~/.crosstalk/config.env` (create the dir `0700
     CROSSTALK_SQS_COGNITO_CLIENT_ID=<APP_CLIENT_ID>
     CROSSTALK_SQS_COGNITO_IDENTITY_POOL_ID=<IDENTITY_POOL_ID>
     CROSSTALK_SQS_COGNITO_USERNAME=<USERNAME>     # this is your email
+    CROSSTALK_SQS_COGNITO_PEER=<PEER>             # your short peer id (inbox/ACL key)
+    CROSSTALK_SQS_INBOX_URL=<INBOX_QUEUE_URL>     # your own inbox FIFO queue
     # CROSSTALK_SQS_COGNITO_PASSWORD is set on first login: check your email for the Cognito invite
     # (temporary password), authenticate once, and set a permanent password — then add it here.
 
