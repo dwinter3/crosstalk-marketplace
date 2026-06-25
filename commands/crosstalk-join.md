@@ -34,8 +34,10 @@ From the pasted bootstrap, write `~/.crosstalk/config.env` (create the dir `0700
     CROSSTALK_SQS_COGNITO_USERNAME=<USERNAME>     # this is your email
     CROSSTALK_SQS_COGNITO_PEER=<PEER>             # your short peer id (inbox/ACL key)
     CROSSTALK_SQS_INBOX_URL=<INBOX_QUEUE_URL>     # your own inbox FIFO queue
-    # CROSSTALK_SQS_COGNITO_PASSWORD is set on first login: check your email for the Cognito invite
-    # (temporary password), authenticate once, and set a permanent password — then add it here.
+    CROSSTALK_SQS_COGNITO_REFRESH_TOKEN=<REFRESH_TOKEN>   # already in your bootstrap — NO password to set
+
+The bootstrap the portal shows is fully self-contained (the refresh token is embedded), so there's
+NO password step — just paste the whole block and write it as ~/.crosstalk/config.env (0600).
 
 Confirm the file is written `0600` and never echo the password back into the transcript.
 
