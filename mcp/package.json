@@ -12,6 +12,9 @@
     "esbuild": "^0.24.0"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.620.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.620.0",
+    "@aws-sdk/client-sqs": "^3.620.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0"
   }

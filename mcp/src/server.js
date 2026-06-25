@@ -92,7 +92,7 @@ server.tool(
       return { content: [{ type: "text", text: `Sent to ${to} via the content screen (MessageId ${r.MessageId || "?"}). It will be delivered if it passes screening.` }] };
     } catch (e) {
       const msg = String(e?.message || e);
-      const hint = /AccessDenied/i.test(msg) ? ` — you don't have a grant to message "${to}" (ask the admin to grant it).` : "";
+      const hint = /AccessDenied|not authorized/i.test(msg) ? ` — you don't have a grant to message "${to}" (ask the admin to grant it).` : "";
       return { isError: true, content: [{ type: "text", text: `send failed: ${msg.split("\n").slice(-2).join(" ").slice(0, 300)}${hint}` }] };
     }
   },
