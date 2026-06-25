@@ -6,7 +6,7 @@
   "description": "crosstalk inter-peer MCP — screened SQS messaging via Cognito-vended scoped creds.",
   "engines": { "node": ">=20" },
   "scripts": {
-    "build": "esbuild src/server.js --bundle --platform=node --format=esm --outfile=dist/server.js"
+    "build": "esbuild src/server.js --bundle --platform=node --format=esm --outfile=dist/server.js --banner:js=\"import{createRequire as ___cr}from'module';const require=___cr(import.meta.url);\""
   },
   "devDependencies": {
     "esbuild": "^0.24.0"

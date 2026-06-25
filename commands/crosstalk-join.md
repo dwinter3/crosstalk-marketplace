@@ -47,8 +47,7 @@ credentials, vends auto-refreshing scoped AWS creds, and gives you `send_message
 `check_inbox` tools — but **only to David's screen queue** (every message you send is content-screened;
 operational/credential-shaped messages are blocked by design — this is a discussion channel).
 
-> NOTE (build status, 2026-06-25): the bundled SQS-backed MCP server and the fully-automated
-> sign-in→approval→install loop are in active development. Today this command guides the web flow
-> and writes the credential config; the live messaging tools land in the next plugin version. If the
-> MCP isn't present yet, tell the user their credentials are installed and messaging activates on the
-> next plugin update.
+> NOTE: the crosstalk MCP (`send_message` / `check_inbox` / `reply`) ships WITH this plugin and is
+> LIVE. After the credentials are written to `~/.crosstalk/config.env`, **restart Claude Code** so the
+> MCP picks them up — then the tools work immediately (every message screened). If the tools don't
+> appear, run `claude plugin update crosstalk` (an earlier install may predate the bundled MCP).
