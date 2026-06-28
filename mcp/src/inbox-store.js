@@ -13,6 +13,10 @@ import { dirname } from "node:path";
 
 const idOf = (m) => m && (m.msg_id || m.message_id || m.id) || null;
 
+// Compaction bound (#2): on each rewrite, keep ALL unread + only the most-recent READ rows (retained
+// purely as dedup history vs SQS redelivery). Bounds inbox.jsonl growth without losing anything live.
+const MAX_READ_HISTORY = 200;
+
 function readAll(storePath) {
   if (!existsSync(storePath)) return [];
   return readFileSync(storePath, "utf8").split("\n").filter(Boolean).map((l) => {
@@ -37,7 +41,10 @@ export function takeUnread(storePath, limit = 50) {
   if (unread.length) {
     const taken = new Set(unread.map((m) => idOf(m)));
     const updated = all.map((m) => (taken.has(idOf(m)) ? { ...m, _read: true } : m));
-    writeFileSync(storePath, updated.map((m) => JSON.stringify(m)).join("\n") + "\n", { mode: 0o600 });
+    // Compaction (#2): keep every unread row + the most-recent MAX_READ_HISTORY read rows (preserve order).
+    const keepRead = new Set(updated.filter((m) => m._read).slice(-MAX_READ_HISTORY).map((m) => idOf(m)));
+    const compacted = updated.filter((m) => !m._read || keepRead.has(idOf(m)));
+    writeFileSync(storePath, compacted.map((m) => JSON.stringify(m)).join("\n") + "\n", { mode: 0o600 });
   }
   return unread;
 }

@@ -58937,6 +58937,7 @@ function signCanonical(privateKey, canonical) {
 import { appendFileSync, readFileSync as readFileSync3, writeFileSync as writeFileSync3, existsSync as existsSync2, mkdirSync as mkdirSync3 } from "node:fs";
 import { dirname as dirname2 } from "node:path";
 var idOf = (m3) => m3 && (m3.msg_id || m3.message_id || m3.id) || null;
+var MAX_READ_HISTORY = 200;
 function readAll(storePath) {
   if (!existsSync2(storePath)) return [];
   return readFileSync3(storePath, "utf8").split("\n").filter(Boolean).map((l3) => {
@@ -58961,7 +58962,9 @@ function takeUnread(storePath, limit = 50) {
   if (unread.length) {
     const taken = new Set(unread.map((m3) => idOf(m3)));
     const updated = all.map((m3) => taken.has(idOf(m3)) ? { ...m3, _read: true } : m3);
-    writeFileSync3(storePath, updated.map((m3) => JSON.stringify(m3)).join("\n") + "\n", { mode: 384 });
+    const keepRead = new Set(updated.filter((m3) => m3._read).slice(-MAX_READ_HISTORY).map((m3) => idOf(m3)));
+    const compacted = updated.filter((m3) => !m3._read || keepRead.has(idOf(m3)));
+    writeFileSync3(storePath, compacted.map((m3) => JSON.stringify(m3)).join("\n") + "\n", { mode: 384 });
   }
   return unread;
 }
@@ -59048,7 +59051,10 @@ function notReadyResult() {
 }
 var INBOX_STORE = process.env.CROSSTALK_INBOX_STORE || join7(homedir3(), ".crosstalk", "inbox.jsonl");
 var AUTOPOLL = (process.env.CROSSTALK_AUTOPOLL || "1") !== "0";
-var server = new McpServer({ name: "crosstalk", version: "0.1.0" });
+var server = new McpServer(
+  { name: "crosstalk", version: "0.1.0" },
+  { capabilities: { tools: {}, experimental: { "claude/channel": {} } } }
+);
 server.tool(
   "send_message",
   "Send a crosstalk message to a peer. Routes through the content screen (academic/discussion only; operational content is blocked by design). You can only reach peers you've been granted access to.",
@@ -59190,7 +59196,10 @@ async function pollLoop() {
 }
 if (ready && AUTOPOLL) {
   const n3 = unreadCount(INBOX_STORE);
-  if (n3 > 0) process.stderr.write(`crosstalk: ${n3} unread message(s) in the local inbox at startup
+  if (n3 > 0) {
+    process.stderr.write(`crosstalk: ${n3} unread message(s) in the local inbox at startup
 `);
+    pushChannel({ from: "crosstalk", subject: "startup", content: `You have ${n3} unread crosstalk message(s) \u2014 call check_inbox to read them.`, msg_id: "startup-hint" });
+  }
   pollLoop();
 }

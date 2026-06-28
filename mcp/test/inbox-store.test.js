@@ -1,7 +1,7 @@
 // mcp/test/inbox-store.test.js — the auto-poller's durable local inbox.
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -39,6 +39,17 @@ test("limit caps how many unread are taken (rest stay unread)", () => {
   const one = takeUnread(store, 1);
   assert.equal(one.length, 1);
   assert.equal(unreadCount(store), 1, "the other stays unread");
+});
+
+test("compaction bounds the store: read history is capped, all unread preserved (#2)", () => {
+  const cstore = join(dir, "compact.jsonl");
+  writeFileSync(cstore, ""); // fresh
+  for (let i = 0; i < 260; i++) { appendIfNew(cstore, msg("c" + i)); takeUnread(cstore); } // 260 read
+  const readLines = () => readFileSync(cstore, "utf8").split("\n").filter(Boolean).length;
+  assert.ok(readLines() <= 201, `read history bounded (was ${readLines()}, expected <=201)`);
+  // a fresh unread survives compaction and is takeable
+  appendIfNew(cstore, msg("c-fresh"));
+  assert.deepEqual(takeUnread(cstore).map((m) => m.msg_id), ["c-fresh"]);
 });
 
 test("dedup falls back to message_id / id field names", () => {

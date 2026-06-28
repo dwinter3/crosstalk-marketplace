@@ -116,7 +116,12 @@ function notReadyResult() {
 const INBOX_STORE = process.env.CROSSTALK_INBOX_STORE || join(homedir(), ".crosstalk", "inbox.jsonl");
 const AUTOPOLL = (process.env.CROSSTALK_AUTOPOLL || "1") !== "0";
 
-const server = new McpServer({ name: "crosstalk", version: "0.1.0" });
+// Declare the `claude/channel` experimental capability so the host routes our notifications/claude/channel
+// wake pushes (matches the fleet crosstalk server). Without this the host may not surface the push at all.
+const server = new McpServer(
+  { name: "crosstalk", version: "0.1.0" },
+  { capabilities: { tools: {}, experimental: { "claude/channel": {} } } },
+);
 
 server.tool(
   "send_message",
@@ -253,6 +258,11 @@ async function pollLoop() {
 
 if (ready && AUTOPOLL) {
   const n = unreadCount(INBOX_STORE);
-  if (n > 0) process.stderr.write(`crosstalk: ${n} unread message(s) in the local inbox at startup\n`);
+  if (n > 0) {
+    process.stderr.write(`crosstalk: ${n} unread message(s) in the local inbox at startup\n`);
+    // #1 — wake on a PRE-EXISTING backlog (messages stored before this MCP (re)started). A count HINT,
+    // not the messages — they stay unread in the store for check_inbox to read (no loss, no double-show).
+    pushChannel({ from: "crosstalk", subject: "startup", content: `You have ${n} unread crosstalk message(s) — call check_inbox to read them.`, msg_id: "startup-hint" });
+  }
   pollLoop(); // fire-and-forget; never awaited (the MCP stays responsive to tool calls)
 }
