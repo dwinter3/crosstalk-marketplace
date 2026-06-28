@@ -1,6 +1,6 @@
 {
   "name": "crosstalk-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "description": "crosstalk inter-peer MCP — screened SQS messaging via Cognito-vended scoped creds.",
@@ -8,7 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "esbuild src/server.js --bundle --platform=node --format=esm --outfile=dist/server.js --banner:js=\"import{createRequire as ___cr}from'module';const require=___cr(import.meta.url);\""
+    "build": "esbuild src/server.js --bundle --platform=node --format=esm --outfile=dist/server.js --banner:js=\"import{createRequire as ___cr}from'module';const require=___cr(import.meta.url);\"",
+    "test": "node --test test/"
   },
   "devDependencies": {
     "esbuild": "^0.24.0"

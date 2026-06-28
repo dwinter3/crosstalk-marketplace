@@ -18540,10 +18540,10 @@ var init_httpSigningMiddleware = __esm({
       if (!scheme) {
         throw new Error(`No HttpAuthScheme was selected: unable to sign request`);
       }
-      const { httpAuthOption: { signingProperties = {} }, identity, signer } = scheme;
+      const { httpAuthOption: { signingProperties = {} }, identity: identity2, signer } = scheme;
       const output = await next({
         ...args,
-        request: await signer.sign(args.request, identity, signingProperties)
+        request: await signer.sign(args.request, identity2, signingProperties)
       }).catch((signer.errorHandler || defaultErrorHandler)(signingProperties));
       (signer.successHandler || defaultSuccessHandler)(output.response, signingProperties);
       return output;
@@ -18685,7 +18685,7 @@ var init_httpApiKeyAuth = __esm({
     init_protocols();
     import_types28 = __toESM(require_dist_cjs());
     HttpApiKeyAuthSigner = class {
-      async sign(httpRequest, identity, signingProperties) {
+      async sign(httpRequest, identity2, signingProperties) {
         if (!signingProperties) {
           throw new Error("request could not be signed with `apiKey` since the `name` and `in` signer properties are missing");
         }
@@ -18695,14 +18695,14 @@ var init_httpApiKeyAuth = __esm({
         if (!signingProperties.in) {
           throw new Error("request could not be signed with `apiKey` since the `in` signer property is missing");
         }
-        if (!identity.apiKey) {
+        if (!identity2.apiKey) {
           throw new Error("request could not be signed with `apiKey` since the `apiKey` is not defined");
         }
         const clonedRequest = HttpRequest.clone(httpRequest);
         if (signingProperties.in === import_types28.HttpApiKeyAuthLocation.QUERY) {
-          clonedRequest.query[signingProperties.name] = identity.apiKey;
+          clonedRequest.query[signingProperties.name] = identity2.apiKey;
         } else if (signingProperties.in === import_types28.HttpApiKeyAuthLocation.HEADER) {
-          clonedRequest.headers[signingProperties.name] = signingProperties.scheme ? `${signingProperties.scheme} ${identity.apiKey}` : identity.apiKey;
+          clonedRequest.headers[signingProperties.name] = signingProperties.scheme ? `${signingProperties.scheme} ${identity2.apiKey}` : identity2.apiKey;
         } else {
           throw new Error("request can only be signed with `apiKey` locations `query` or `header`, but found: `" + signingProperties.in + "`");
         }
@@ -18718,12 +18718,12 @@ var init_httpBearerAuth = __esm({
   "node_modules/@smithy/core/dist-es/legacy-root-exports/util-identity-and-auth/httpAuthSchemes/httpBearerAuth.js"() {
     init_protocols();
     HttpBearerAuthSigner = class {
-      async sign(httpRequest, identity, signingProperties) {
+      async sign(httpRequest, identity2, signingProperties) {
         const clonedRequest = HttpRequest.clone(httpRequest);
-        if (!identity.token) {
+        if (!identity2.token) {
           throw new Error("request could not be signed with `token` since the `token` is not defined");
         }
-        clonedRequest.headers["Authorization"] = `Bearer ${identity.token}`;
+        clonedRequest.headers["Authorization"] = `Bearer ${identity2.token}`;
         return clonedRequest;
       }
     };
@@ -18735,7 +18735,7 @@ var NoAuthSigner;
 var init_noAuth = __esm({
   "node_modules/@smithy/core/dist-es/legacy-root-exports/util-identity-and-auth/httpAuthSchemes/noAuth.js"() {
     NoAuthSigner = class {
-      async sign(httpRequest, identity, signingProperties) {
+      async sign(httpRequest, identity2, signingProperties) {
         return httpRequest;
       }
     };
@@ -18755,12 +18755,12 @@ var init_httpAuthSchemes = __esm({
 var createIsIdentityExpiredFunction, EXPIRATION_MS, isIdentityExpired, doesIdentityRequireRefresh, memoizeIdentityProvider;
 var init_memoizeIdentityProvider = __esm({
   "node_modules/@smithy/core/dist-es/legacy-root-exports/util-identity-and-auth/memoizeIdentityProvider.js"() {
-    createIsIdentityExpiredFunction = (expirationMs) => function isIdentityExpired2(identity) {
-      return doesIdentityRequireRefresh(identity) && identity.expiration.getTime() - Date.now() < expirationMs;
+    createIsIdentityExpiredFunction = (expirationMs) => function isIdentityExpired2(identity2) {
+      return doesIdentityRequireRefresh(identity2) && identity2.expiration.getTime() - Date.now() < expirationMs;
     };
     EXPIRATION_MS = 3e5;
     isIdentityExpired = createIsIdentityExpiredFunction(EXPIRATION_MS);
-    doesIdentityRequireRefresh = (identity) => identity.expiration !== void 0;
+    doesIdentityRequireRefresh = (identity2) => identity2.expiration !== void 0;
     memoizeIdentityProvider = (provider, isExpired, requiresRefresh) => {
       if (provider === void 0) {
         return void 0;
@@ -19260,9 +19260,9 @@ async function checkFeatures(context, config2, args) {
         break;
     }
   }
-  const identity = context.__smithy_context?.selectedHttpAuthScheme?.identity;
-  if (identity?.$source) {
-    const credentials = identity;
+  const identity2 = context.__smithy_context?.selectedHttpAuthScheme?.identity;
+  if (identity2?.$source) {
+    const credentials = identity2;
     if (credentials.accountId) {
       setFeature2(context, "RESOLVED_ACCOUNT_ID", "T");
     }
@@ -19419,12 +19419,12 @@ import { normalize, sep as sep2 } from "node:path";
 var getNodeModulesParentDirs;
 var init_getNodeModulesParentDirs = __esm({
   "node_modules/@aws-sdk/core/dist-es/submodules/client/util-user-agent-node/getNodeModulesParentDirs.js"() {
-    getNodeModulesParentDirs = (dirname) => {
+    getNodeModulesParentDirs = (dirname2) => {
       const cwd = process.cwd();
-      if (!dirname) {
+      if (!dirname2) {
         return [cwd];
       }
-      const normalizedPath = normalize(dirname);
+      const normalizedPath = normalize(dirname2);
       const parts = normalizedPath.split(sep2);
       const nodeModulesIndex = parts.indexOf("node_modules");
       const parentDir = nodeModulesIndex !== -1 ? parts.slice(0, nodeModulesIndex).join(sep2) : normalizedPath;
@@ -19499,8 +19499,8 @@ var init_getTypeScriptUserAgentPair = __esm({
         tscVersion = null;
         return void 0;
       }
-      const dirname = typeof __dirname !== "undefined" ? __dirname : void 0;
-      const nodeModulesParentDirs = getNodeModulesParentDirs(dirname);
+      const dirname2 = typeof __dirname !== "undefined" ? __dirname : void 0;
+      const nodeModulesParentDirs = getNodeModulesParentDirs(dirname2);
       let versionFromApp;
       for (const nodeModulesParentDir of nodeModulesParentDirs) {
         try {
@@ -20848,7 +20848,7 @@ var init_AwsSdkSigV4Signer = __esm({
       };
     };
     AwsSdkSigV4Signer = class {
-      async sign(httpRequest, identity, signingProperties) {
+      async sign(httpRequest, identity2, signingProperties) {
         if (!HttpRequest.isInstance(httpRequest)) {
           throw new Error("The request is not an instance of `HttpRequest` and cannot be signed");
         }
@@ -20910,7 +20910,7 @@ var init_AwsSdkSigV4ASigner = __esm({
     init_utils3();
     init_AwsSdkSigV4Signer();
     AwsSdkSigV4ASigner = class extends AwsSdkSigV4Signer {
-      async sign(httpRequest, identity, signingProperties) {
+      async sign(httpRequest, identity2, signingProperties) {
         if (!HttpRequest.isInstance(httpRequest)) {
           throw new Error("The request is not an instance of `HttpRequest` and cannot be signed");
         }
@@ -29959,7 +29959,7 @@ var require_dist_cjs13 = __commonJS({
     var { createHash: createHash3, createPrivateKey, createPublicKey, sign } = __require("node:crypto");
     var { promises } = __require("node:fs");
     var { homedir: homedir4 } = __require("node:os");
-    var { dirname, join: join8 } = __require("node:path");
+    var { dirname: dirname2, join: join8 } = __require("node:path");
     var LoginCredentialsFetcher = class _LoginCredentialsFetcher {
       profileData;
       init;
@@ -30107,7 +30107,7 @@ var require_dist_cjs13 = __commonJS({
       }
       async saveToken(token) {
         const tokenFilePath = this.getTokenFilePath();
-        const directory = dirname(tokenFilePath);
+        const directory = dirname2(tokenFilePath);
         try {
           await promises.mkdir(directory, { recursive: true });
         } catch (error3) {
@@ -31675,7 +31675,7 @@ var require_fromTokenFile = __commonJS({
   "node_modules/@aws-sdk/credential-provider-web-identity/dist-cjs/fromTokenFile.js"(exports) {
     var { setCredentialFeature: setCredentialFeature2 } = (init_client3(), __toCommonJS(client_exports2));
     var { CredentialsProviderError: CredentialsProviderError2, externalDataInterceptor: externalDataInterceptor2 } = (init_config2(), __toCommonJS(config_exports));
-    var { readFileSync: readFileSync3 } = __require("node:fs");
+    var { readFileSync: readFileSync4 } = __require("node:fs");
     var { fromWebToken } = require_fromWebToken();
     var ENV_TOKEN_FILE = "AWS_WEB_IDENTITY_TOKEN_FILE";
     var ENV_ROLE_ARN = "AWS_ROLE_ARN";
@@ -31692,7 +31692,7 @@ var require_fromTokenFile = __commonJS({
       }
       const credentials = await fromWebToken({
         ...init,
-        webIdentityToken: externalDataInterceptor2?.getTokenRecord?.()[webIdentityTokenFile] ?? readFileSync3(webIdentityTokenFile, { encoding: "ascii" }),
+        webIdentityToken: externalDataInterceptor2?.getTokenRecord?.()[webIdentityTokenFile] ?? readFileSync4(webIdentityTokenFile, { encoding: "ascii" }),
         roleArn,
         roleSessionName
       })(awsIdentityProperties);
@@ -44531,7 +44531,7 @@ var require_dist_cjs22 = __commonJS({
 });
 
 // src/server.js
-import { readFileSync as readFileSync2, existsSync } from "node:fs";
+import { readFileSync as readFileSync3, existsSync as existsSync2 } from "node:fs";
 import { homedir as homedir3 } from "node:os";
 import { join as join7 } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -58888,12 +58888,57 @@ async function deleteMessage({ region, queueUrl, receiptHandle, creds: creds2 })
   }));
 }
 
+// src/identity.js
+import crypto2 from "node:crypto";
+import { readFileSync as readFileSync2, writeFileSync as writeFileSync2, existsSync, mkdirSync as mkdirSync2 } from "node:fs";
+import { dirname } from "node:path";
+
+// src/canonical-envelope.js
+function canonicalEnvelope(m3) {
+  const mm = m3 || {};
+  const msgId = mm.msg_id != null ? mm.msg_id : mm.id;
+  return JSON.stringify({
+    v: 1,
+    msg_id: String(msgId == null ? "" : msgId),
+    thread_id: String(mm.thread_id == null ? "" : mm.thread_id),
+    from: String(mm.from == null ? "" : mm.from),
+    to: String(mm.to == null ? "" : mm.to),
+    subject: String(mm.subject == null ? "" : mm.subject),
+    content: String(mm.content == null ? "" : mm.content),
+    ts: String(mm.ts == null ? "" : mm.ts)
+  });
+}
+
+// src/identity.js
+function spkiB64(publicKey) {
+  return publicKey.export({ type: "spki", format: "der" }).toString("base64");
+}
+function fingerprintOf(pubkeyB64) {
+  return crypto2.createHash("sha256").update(Buffer.from(pubkeyB64, "base64")).digest("hex");
+}
+function loadOrCreateIdentity(storePath) {
+  let priv;
+  if (existsSync(storePath)) {
+    priv = crypto2.createPrivateKey(readFileSync2(storePath, "utf8"));
+    if (priv.asymmetricKeyType !== "ed25519") throw new Error("crosstalk identity key is not ed25519");
+  } else {
+    priv = crypto2.generateKeyPairSync("ed25519").privateKey;
+    mkdirSync2(dirname(storePath), { recursive: true });
+    writeFileSync2(storePath, priv.export({ type: "pkcs8", format: "pem" }).toString(), { mode: 384 });
+  }
+  const pubkeyB64 = spkiB64(crypto2.createPublicKey(priv));
+  return { privateKey: priv, pubkeyB64, fingerprint: fingerprintOf(pubkeyB64) };
+}
+function signCanonical(privateKey, canonical) {
+  return crypto2.sign(null, Buffer.from(canonicalEnvelope(canonical), "utf8"), privateKey).toString("base64");
+}
+
 // src/server.js
 var CONFIG_PATH = process.env.CROSSTALK_CONFIG || join7(homedir3(), ".crosstalk", "config.env");
 function loadConfig2(path) {
   const out = {};
-  if (!existsSync(path)) return out;
-  for (let line of readFileSync2(path, "utf8").split("\n")) {
+  if (!existsSync2(path)) return out;
+  for (let line of readFileSync3(path, "utf8").split("\n")) {
     line = line.trim();
     if (!line || line.startsWith("#")) continue;
     line = line.replace(/^export\s+/, "");
@@ -58916,6 +58961,31 @@ var cfg = loadConfig2(CONFIG_PATH);
 var cognito = cognitoConfigFromEnv(cfg);
 var inbox = parseInboxUrl(cfg.CROSSTALK_SQS_INBOX_URL);
 var ready = !!(cognito && inbox);
+var IDENTITY_PATH = process.env.CROSSTALK_IDENTITY || join7(homedir3(), ".crosstalk", "identity.pem");
+var identity = null;
+if (ready) {
+  try {
+    identity = loadOrCreateIdentity(IDENTITY_PATH);
+  } catch (e5) {
+    process.stderr.write(`crosstalk: signing identity unavailable (${e5?.message || e5}); sending unsigned
+`);
+  }
+}
+function buildBody({ from, to, subject, content }) {
+  const msg_id = randomBytes(8).toString("hex");
+  const ts = (/* @__PURE__ */ new Date()).toISOString();
+  const base = { from, to, subject: subject || "", content, msg_id, ts };
+  if (identity) {
+    try {
+      const sig = signCanonical(identity.privateKey, { msg_id, from, to, subject: subject || "", content, ts });
+      return JSON.stringify({ ...base, sig, advertised_pubkey: identity.pubkeyB64, from_node: from });
+    } catch (e5) {
+      process.stderr.write(`crosstalk: sign failed (${e5?.message || e5}); sending unsigned
+`);
+    }
+  }
+  return JSON.stringify(base);
+}
 async function creds() {
   return resolveCognitoCreds({
     region: cognito.region,
@@ -58947,13 +59017,7 @@ server.tool(
   { to: external_exports.string().describe("recipient peer name"), subject: external_exports.string().optional(), content: external_exports.string().describe("message body") },
   async ({ to, subject, content }) => {
     if (!ready) return notReadyResult();
-    const body = JSON.stringify({
-      from: inbox.peer,
-      to,
-      subject: subject || "",
-      content,
-      msg_id: randomBytes(8).toString("hex")
-    });
+    const body = buildBody({ from: inbox.peer, to, subject: subject || "", content });
     try {
       const c5 = await creds();
       const r5 = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c5 });
@@ -59001,7 +59065,7 @@ server.tool(
   { to: external_exports.string(), content: external_exports.string(), subject: external_exports.string().optional() },
   async ({ to, content, subject }) => {
     if (!ready) return notReadyResult();
-    const body = JSON.stringify({ from: inbox.peer, to, subject: subject || "re:", content, msg_id: randomBytes(8).toString("hex") });
+    const body = buildBody({ from: inbox.peer, to, subject: subject || "re:", content });
     try {
       const c5 = await creds();
       const r5 = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c5 });
@@ -59009,6 +59073,20 @@ server.tool(
     } catch (e5) {
       return { isError: true, content: [{ type: "text", text: `reply failed: ${String(e5?.message || e5).split("\n").slice(-2).join(" ").slice(0, 300)}` }] };
     }
+  }
+);
+server.tool(
+  "crosstalk_identity",
+  "Show this peer's signing identity \u2014 public key + fingerprint \u2014 so the network admin can pin it out-of-band (enables cryptographic origin-verification of your messages). The private key never leaves this machine.",
+  {},
+  async () => {
+    if (!ready) return notReadyResult();
+    if (!identity) return { isError: true, content: [{ type: "text", text: "No signing identity is available (it could not be created); messages are sent unsigned." }] };
+    return { content: [{ type: "text", text: `peer:        ${inbox.peer}
+public key:  ${identity.pubkeyB64}
+fingerprint: ${identity.fingerprint}
+
+Send the fingerprint to the network admin out-of-band so they can pin your key.` }] };
   }
 );
 var transport = new StdioServerTransport();
