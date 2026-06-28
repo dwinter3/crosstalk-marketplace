@@ -17,6 +17,7 @@ import { z } from "zod";
 import { resolveCognitoCreds, cognitoConfigFromEnv } from "./cognito-creds.js";
 import { sendMessage, receiveMessages, deleteMessage } from "./sqs.js";
 import { loadOrCreateIdentity, signCanonical } from "./identity.js";
+import { appendIfNew, takeUnread, unreadCount } from "./inbox-store.js";
 
 const CONFIG_PATH = process.env.CROSSTALK_CONFIG || join(homedir(), ".crosstalk", "config.env");
 
@@ -108,7 +109,19 @@ function notReadyResult() {
   };
 }
 
-const server = new McpServer({ name: "crosstalk", version: "0.1.0" });
+// Auto-poller (the marketplace daemon-equivalent). A background loop long-polls THIS peer's SQS inbox,
+// stores each arrival durably, and pushes a `notifications/claude/channel` wake — so an idle session
+// receives without manually calling check_inbox (closing the "external peer accumulates a silent
+// backlog" gap). On by default; CROSSTALK_AUTOPOLL=0 disables it (falls back to manual check_inbox).
+const INBOX_STORE = process.env.CROSSTALK_INBOX_STORE || join(homedir(), ".crosstalk", "inbox.jsonl");
+const AUTOPOLL = (process.env.CROSSTALK_AUTOPOLL || "1") !== "0";
+
+// Declare the `claude/channel` experimental capability so the host routes our notifications/claude/channel
+// wake pushes (matches the fleet crosstalk server). Without this the host may not surface the push at all.
+const server = new McpServer(
+  { name: "crosstalk", version: "0.1.0" },
+  { capabilities: { tools: {}, experimental: { "claude/channel": {} } } },
+);
 
 server.tool(
   "send_message",
@@ -136,6 +149,15 @@ server.tool(
   async ({ limit }) => {
     if (!ready) return notReadyResult();
     try {
+      // With AUTOPOLL on, the background poller is the sole SQS reader and has already stored arrivals
+      // durably — read UNREAD from the local store (and the poller never loses a message even if a push
+      // didn't surface). With AUTOPOLL off, fall back to a direct SQS pull (legacy behavior).
+      if (AUTOPOLL) {
+        const msgs = takeUnread(INBOX_STORE, limit || 10);
+        if (!msgs.length) return { content: [{ type: "text", text: "No new messages." }] };
+        const out = msgs.map((p) => `from ${p.from || "?"}${p.subject ? ` [${p.subject}]` : ""}: ${p.content || ""}`);
+        return { content: [{ type: "text", text: out.join("\n\n") }] };
+      }
       const c = await creds();
       const msgs = await receiveMessages({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, max: limit || 5, creds: c });
       if (!msgs.length) return { content: [{ type: "text", text: "No new messages." }] };
@@ -187,3 +209,60 @@ server.tool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
+
+// ── Auto-poller: SQS → durable store → wake push (the marketplace daemon-equivalent) ──────────────
+function pushChannel(msg) {
+  // Surface an inbound message to the host (Claude Code renders it as a <channel> notification). EVERY
+  // `meta` value MUST be a string — Claude Code validates meta via Zod `z.record(z.string())`; a
+  // non-string raises a ZodError that SILENTLY drops the stdio connection (the documented crosstalk trap).
+  try {
+    server.server.notification({
+      method: "notifications/claude/channel",
+      params: {
+        content: `${msg.from || "?"}${msg.subject ? ` [${msg.subject}]` : ""}: ${msg.content || ""}`,
+        meta: {
+          type: String(msg.type || "message"),
+          from: String(msg.from || "?"),
+          from_id: String(msg.from || "?"),
+          message_id: String(msg.msg_id || msg.message_id || msg.id || ""),
+          thread_id: String(msg.thread_id || ""),
+          subject: String(msg.subject || ""),
+          ts: String(msg.ts || ""),
+        },
+      },
+    });
+  } catch (e) {
+    process.stderr.write(`crosstalk: channel push failed (${e?.message || e})\n`);
+  }
+}
+
+async function pollOnce() {
+  const c = await creds();
+  const msgs = await receiveMessages({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, max: 10, waitSeconds: 20, creds: c });
+  for (const m of msgs) {
+    let parsed; try { parsed = JSON.parse(m.Body); } catch { parsed = { content: m.Body }; }
+    const isNew = appendIfNew(INBOX_STORE, parsed);  // DURABLE before ack — a message is never lost
+    try { await deleteMessage({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, receiptHandle: m.ReceiptHandle, creds: c }); }
+    catch (e) { process.stderr.write(`crosstalk: ack failed (${e?.message || e})\n`); }
+    if (isNew) pushChannel(parsed);  // best-effort wake; check_inbox (reads the store) is the durable fallback
+  }
+}
+
+async function pollLoop() {
+  // receiveMessages long-polls (blocks up to waitSeconds), so this is event-ish, not a busy loop.
+  for (;;) {
+    try { await pollOnce(); }
+    catch (e) { process.stderr.write(`crosstalk: poll error (${e?.message || e})\n`); await new Promise((r) => setTimeout(r, 5000)); }
+  }
+}
+
+if (ready && AUTOPOLL) {
+  const n = unreadCount(INBOX_STORE);
+  if (n > 0) {
+    process.stderr.write(`crosstalk: ${n} unread message(s) in the local inbox at startup\n`);
+    // #1 — wake on a PRE-EXISTING backlog (messages stored before this MCP (re)started). A count HINT,
+    // not the messages — they stay unread in the store for check_inbox to read (no loss, no double-show).
+    pushChannel({ from: "crosstalk", subject: "startup", content: `You have ${n} unread crosstalk message(s) — call check_inbox to read them.`, msg_id: "startup-hint" });
+  }
+  pollLoop(); // fire-and-forget; never awaited (the MCP stays responsive to tool calls)
+}

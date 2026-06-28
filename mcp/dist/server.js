@@ -19419,12 +19419,12 @@ import { normalize, sep as sep2 } from "node:path";
 var getNodeModulesParentDirs;
 var init_getNodeModulesParentDirs = __esm({
   "node_modules/@aws-sdk/core/dist-es/submodules/client/util-user-agent-node/getNodeModulesParentDirs.js"() {
-    getNodeModulesParentDirs = (dirname2) => {
+    getNodeModulesParentDirs = (dirname3) => {
       const cwd = process.cwd();
-      if (!dirname2) {
+      if (!dirname3) {
         return [cwd];
       }
-      const normalizedPath = normalize(dirname2);
+      const normalizedPath = normalize(dirname3);
       const parts = normalizedPath.split(sep2);
       const nodeModulesIndex = parts.indexOf("node_modules");
       const parentDir = nodeModulesIndex !== -1 ? parts.slice(0, nodeModulesIndex).join(sep2) : normalizedPath;
@@ -19499,8 +19499,8 @@ var init_getTypeScriptUserAgentPair = __esm({
         tscVersion = null;
         return void 0;
       }
-      const dirname2 = typeof __dirname !== "undefined" ? __dirname : void 0;
-      const nodeModulesParentDirs = getNodeModulesParentDirs(dirname2);
+      const dirname3 = typeof __dirname !== "undefined" ? __dirname : void 0;
+      const nodeModulesParentDirs = getNodeModulesParentDirs(dirname3);
       let versionFromApp;
       for (const nodeModulesParentDir of nodeModulesParentDirs) {
         try {
@@ -29959,7 +29959,7 @@ var require_dist_cjs13 = __commonJS({
     var { createHash: createHash3, createPrivateKey, createPublicKey, sign } = __require("node:crypto");
     var { promises } = __require("node:fs");
     var { homedir: homedir4 } = __require("node:os");
-    var { dirname: dirname2, join: join8 } = __require("node:path");
+    var { dirname: dirname3, join: join8 } = __require("node:path");
     var LoginCredentialsFetcher = class _LoginCredentialsFetcher {
       profileData;
       init;
@@ -30107,7 +30107,7 @@ var require_dist_cjs13 = __commonJS({
       }
       async saveToken(token) {
         const tokenFilePath = this.getTokenFilePath();
-        const directory = dirname2(tokenFilePath);
+        const directory = dirname3(tokenFilePath);
         try {
           await promises.mkdir(directory, { recursive: true });
         } catch (error3) {
@@ -31675,7 +31675,7 @@ var require_fromTokenFile = __commonJS({
   "node_modules/@aws-sdk/credential-provider-web-identity/dist-cjs/fromTokenFile.js"(exports) {
     var { setCredentialFeature: setCredentialFeature2 } = (init_client3(), __toCommonJS(client_exports2));
     var { CredentialsProviderError: CredentialsProviderError2, externalDataInterceptor: externalDataInterceptor2 } = (init_config2(), __toCommonJS(config_exports));
-    var { readFileSync: readFileSync4 } = __require("node:fs");
+    var { readFileSync: readFileSync5 } = __require("node:fs");
     var { fromWebToken } = require_fromWebToken();
     var ENV_TOKEN_FILE = "AWS_WEB_IDENTITY_TOKEN_FILE";
     var ENV_ROLE_ARN = "AWS_ROLE_ARN";
@@ -31692,7 +31692,7 @@ var require_fromTokenFile = __commonJS({
       }
       const credentials = await fromWebToken({
         ...init,
-        webIdentityToken: externalDataInterceptor2?.getTokenRecord?.()[webIdentityTokenFile] ?? readFileSync4(webIdentityTokenFile, { encoding: "ascii" }),
+        webIdentityToken: externalDataInterceptor2?.getTokenRecord?.()[webIdentityTokenFile] ?? readFileSync5(webIdentityTokenFile, { encoding: "ascii" }),
         roleArn,
         roleSessionName
       })(awsIdentityProperties);
@@ -44531,7 +44531,7 @@ var require_dist_cjs22 = __commonJS({
 });
 
 // src/server.js
-import { readFileSync as readFileSync3, existsSync as existsSync2 } from "node:fs";
+import { readFileSync as readFileSync4, existsSync as existsSync3 } from "node:fs";
 import { homedir as homedir3 } from "node:os";
 import { join as join7 } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -58933,12 +58933,51 @@ function signCanonical(privateKey, canonical) {
   return crypto2.sign(null, Buffer.from(canonicalEnvelope(canonical), "utf8"), privateKey).toString("base64");
 }
 
+// src/inbox-store.js
+import { appendFileSync, readFileSync as readFileSync3, writeFileSync as writeFileSync3, existsSync as existsSync2, mkdirSync as mkdirSync3 } from "node:fs";
+import { dirname as dirname2 } from "node:path";
+var idOf = (m3) => m3 && (m3.msg_id || m3.message_id || m3.id) || null;
+var MAX_READ_HISTORY = 200;
+function readAll(storePath) {
+  if (!existsSync2(storePath)) return [];
+  return readFileSync3(storePath, "utf8").split("\n").filter(Boolean).map((l3) => {
+    try {
+      return JSON.parse(l3);
+    } catch {
+      return null;
+    }
+  }).filter(Boolean);
+}
+function appendIfNew(storePath, msg) {
+  mkdirSync3(dirname2(storePath), { recursive: true });
+  const id = idOf(msg);
+  if (id && readAll(storePath).some((m3) => idOf(m3) === id)) return false;
+  const row = { ...msg, _read: false, _stored_at: (/* @__PURE__ */ new Date()).toISOString() };
+  appendFileSync(storePath, JSON.stringify(row) + "\n", { mode: 384 });
+  return true;
+}
+function takeUnread(storePath, limit = 50) {
+  const all = readAll(storePath);
+  const unread = all.filter((m3) => !m3._read).slice(0, limit);
+  if (unread.length) {
+    const taken = new Set(unread.map((m3) => idOf(m3)));
+    const updated = all.map((m3) => taken.has(idOf(m3)) ? { ...m3, _read: true } : m3);
+    const keepRead = new Set(updated.filter((m3) => m3._read).slice(-MAX_READ_HISTORY).map((m3) => idOf(m3)));
+    const compacted = updated.filter((m3) => !m3._read || keepRead.has(idOf(m3)));
+    writeFileSync3(storePath, compacted.map((m3) => JSON.stringify(m3)).join("\n") + "\n", { mode: 384 });
+  }
+  return unread;
+}
+function unreadCount(storePath) {
+  return readAll(storePath).filter((m3) => !m3._read).length;
+}
+
 // src/server.js
 var CONFIG_PATH = process.env.CROSSTALK_CONFIG || join7(homedir3(), ".crosstalk", "config.env");
 function loadConfig2(path) {
   const out = {};
-  if (!existsSync2(path)) return out;
-  for (let line of readFileSync3(path, "utf8").split("\n")) {
+  if (!existsSync3(path)) return out;
+  for (let line of readFileSync4(path, "utf8").split("\n")) {
     line = line.trim();
     if (!line || line.startsWith("#")) continue;
     line = line.replace(/^export\s+/, "");
@@ -59010,7 +59049,12 @@ function notReadyResult() {
     }]
   };
 }
-var server = new McpServer({ name: "crosstalk", version: "0.1.0" });
+var INBOX_STORE = process.env.CROSSTALK_INBOX_STORE || join7(homedir3(), ".crosstalk", "inbox.jsonl");
+var AUTOPOLL = (process.env.CROSSTALK_AUTOPOLL || "1") !== "0";
+var server = new McpServer(
+  { name: "crosstalk", version: "0.1.0" },
+  { capabilities: { tools: {}, experimental: { "claude/channel": {} } } }
+);
 server.tool(
   "send_message",
   "Send a crosstalk message to a peer. Routes through the content screen (academic/discussion only; operational content is blocked by design). You can only reach peers you've been granted access to.",
@@ -59036,6 +59080,12 @@ server.tool(
   async ({ limit }) => {
     if (!ready) return notReadyResult();
     try {
+      if (AUTOPOLL) {
+        const msgs2 = takeUnread(INBOX_STORE, limit || 10);
+        if (!msgs2.length) return { content: [{ type: "text", text: "No new messages." }] };
+        const out2 = msgs2.map((p3) => `from ${p3.from || "?"}${p3.subject ? ` [${p3.subject}]` : ""}: ${p3.content || ""}`);
+        return { content: [{ type: "text", text: out2.join("\n\n") }] };
+      }
       const c5 = await creds();
       const msgs = await receiveMessages({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, max: limit || 5, creds: c5 });
       if (!msgs.length) return { content: [{ type: "text", text: "No new messages." }] };
@@ -59091,3 +59141,65 @@ Send the fingerprint to the network admin out-of-band so they can pin your key.`
 );
 var transport = new StdioServerTransport();
 await server.connect(transport);
+function pushChannel(msg) {
+  try {
+    server.server.notification({
+      method: "notifications/claude/channel",
+      params: {
+        content: `${msg.from || "?"}${msg.subject ? ` [${msg.subject}]` : ""}: ${msg.content || ""}`,
+        meta: {
+          type: String(msg.type || "message"),
+          from: String(msg.from || "?"),
+          from_id: String(msg.from || "?"),
+          message_id: String(msg.msg_id || msg.message_id || msg.id || ""),
+          thread_id: String(msg.thread_id || ""),
+          subject: String(msg.subject || ""),
+          ts: String(msg.ts || "")
+        }
+      }
+    });
+  } catch (e5) {
+    process.stderr.write(`crosstalk: channel push failed (${e5?.message || e5})
+`);
+  }
+}
+async function pollOnce() {
+  const c5 = await creds();
+  const msgs = await receiveMessages({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, max: 10, waitSeconds: 20, creds: c5 });
+  for (const m3 of msgs) {
+    let parsed;
+    try {
+      parsed = JSON.parse(m3.Body);
+    } catch {
+      parsed = { content: m3.Body };
+    }
+    const isNew = appendIfNew(INBOX_STORE, parsed);
+    try {
+      await deleteMessage({ region: inbox.region, queueUrl: cfg.CROSSTALK_SQS_INBOX_URL, receiptHandle: m3.ReceiptHandle, creds: c5 });
+    } catch (e5) {
+      process.stderr.write(`crosstalk: ack failed (${e5?.message || e5})
+`);
+    }
+    if (isNew) pushChannel(parsed);
+  }
+}
+async function pollLoop() {
+  for (; ; ) {
+    try {
+      await pollOnce();
+    } catch (e5) {
+      process.stderr.write(`crosstalk: poll error (${e5?.message || e5})
+`);
+      await new Promise((r5) => setTimeout(r5, 5e3));
+    }
+  }
+}
+if (ready && AUTOPOLL) {
+  const n3 = unreadCount(INBOX_STORE);
+  if (n3 > 0) {
+    process.stderr.write(`crosstalk: ${n3} unread message(s) in the local inbox at startup
+`);
+    pushChannel({ from: "crosstalk", subject: "startup", content: `You have ${n3} unread crosstalk message(s) \u2014 call check_inbox to read them.`, msg_id: "startup-hint" });
+  }
+  pollLoop();
+}

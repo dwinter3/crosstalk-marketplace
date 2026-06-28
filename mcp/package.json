@@ -1,6 +1,6 @@
 {
   "name": "crosstalk-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "type": "module",
   "description": "crosstalk inter-peer MCP — screened SQS messaging via Cognito-vended scoped creds.",
