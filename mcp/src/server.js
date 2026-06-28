@@ -16,6 +16,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { resolveCognitoCreds, cognitoConfigFromEnv } from "./cognito-creds.js";
 import { sendMessage, receiveMessages, deleteMessage } from "./sqs.js";
+import { loadOrCreateIdentity, signCanonical } from "./identity.js";
 
 const CONFIG_PATH = process.env.CROSSTALK_CONFIG || join(homedir(), ".crosstalk", "config.env");
 
@@ -53,6 +54,34 @@ const cognito = cognitoConfigFromEnv(cfg); // reads CROSSTALK_SQS_COGNITO* keys 
 const inbox = parseInboxUrl(cfg.CROSSTALK_SQS_INBOX_URL);
 const ready = !!(cognito && inbox);
 
+// #1179 — the peer's L3 signing identity (first-run mints + persists ~/.crosstalk/identity.pem, 0600).
+// FAIL-SOFT: if it can't load/create, we send UNSIGNED (today's behavior) rather than block sends.
+const IDENTITY_PATH = process.env.CROSSTALK_IDENTITY || join(homedir(), ".crosstalk", "identity.pem");
+let identity = null;
+if (ready) {
+  try { identity = loadOrCreateIdentity(IDENTITY_PATH); }
+  catch (e) { process.stderr.write(`crosstalk: signing identity unavailable (${e?.message || e}); sending unsigned\n`); }
+}
+
+// Build the outbound envelope body, SIGNED when an identity is present (#1179). The canonical fields
+// {msg_id, from, to, subject, content, ts} are signed via the vendored canonicalEnvelope — byte-identical
+// to the receiver's — and sig/advertised_pubkey/from_node are attached OUTSIDE the canonical (the L4
+// notary preserves them as the inner `origin` block). Fail-soft to unsigned on any signing error.
+function buildBody({ from, to, subject, content }) {
+  const msg_id = randomBytes(8).toString("hex");
+  const ts = new Date().toISOString();
+  const base = { from, to, subject: subject || "", content, msg_id, ts };
+  if (identity) {
+    try {
+      const sig = signCanonical(identity.privateKey, { msg_id, from, to, subject: subject || "", content, ts });
+      return JSON.stringify({ ...base, sig, advertised_pubkey: identity.pubkeyB64, from_node: from });
+    } catch (e) {
+      process.stderr.write(`crosstalk: sign failed (${e?.message || e}); sending unsigned\n`);
+    }
+  }
+  return JSON.stringify(base);
+}
+
 async function creds() {
   return resolveCognitoCreds({
     region: cognito.region,
@@ -87,10 +116,7 @@ server.tool(
   { to: z.string().describe("recipient peer name"), subject: z.string().optional(), content: z.string().describe("message body") },
   async ({ to, subject, content }) => {
     if (!ready) return notReadyResult();
-    const body = JSON.stringify({
-      from: inbox.peer, to, subject: subject || "", content,
-      msg_id: randomBytes(8).toString("hex"),
-    });
+    const body = buildBody({ from: inbox.peer, to, subject: subject || "", content });
     try {
       const c = await creds();
       const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c });
@@ -133,7 +159,7 @@ server.tool(
   async ({ to, content, subject }) => {
     if (!ready) return notReadyResult();
     // Same path as send_message; thread context is carried in the subject for now.
-    const body = JSON.stringify({ from: inbox.peer, to, subject: subject || "re:", content, msg_id: randomBytes(8).toString("hex") });
+    const body = buildBody({ from: inbox.peer, to, subject: subject || "re:", content });
     try {
       const c = await creds();
       const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c });
@@ -141,6 +167,21 @@ server.tool(
     } catch (e) {
       return { isError: true, content: [{ type: "text", text: `reply failed: ${String(e?.message || e).split("\n").slice(-2).join(" ").slice(0, 300)}` }] };
     }
+  },
+);
+
+server.tool(
+  "crosstalk_identity",
+  "Show this peer's signing identity — public key + fingerprint — so the network admin can pin it out-of-band (enables cryptographic origin-verification of your messages). The private key never leaves this machine.",
+  {},
+  async () => {
+    if (!ready) return notReadyResult();
+    if (!identity) return { isError: true, content: [{ type: "text", text: "No signing identity is available (it could not be created); messages are sent unsigned." }] };
+    return { content: [{ type: "text", text:
+      `peer:        ${inbox.peer}\n` +
+      `public key:  ${identity.pubkeyB64}\n` +
+      `fingerprint: ${identity.fingerprint}\n\n` +
+      `Send the fingerprint to the network admin out-of-band so they can pin your key.` }] };
   },
 );
 

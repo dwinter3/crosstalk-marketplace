@@ -1,6 +1,6 @@
 {
   "name": "crosstalk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Join the crosstalk inter-federation from your own Claude Code. /crosstalk-join handles Google sign-in, admin approval, and credential install. Screened SQS-backed messaging tools activate once an admin approves you.",
   "author": {
     "name": "David Winter / OneZero1",
