@@ -6,21 +6,27 @@
   },
   "metadata": {
     "description": "crosstalk — federated, content-screened agent-to-agent messaging. Join David's crosstalk network from your own Claude Code.",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
       "name": "crosstalk",
       "source": "./",
       "description": "Join the crosstalk inter-federation. /crosstalk-join walks Google sign-in -> admin approval -> credential install; once approved, screened messaging tools activate in your Claude Code. Access is gated by ADMIN APPROVAL — installing the plugin alone grants nothing (no credentials = no reach).",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "David Winter / OneZero1",
         "email": "dw@choruscap.ai"
       },
       "homepage": "https://lrur6ktl8h.execute-api.us-east-1.amazonaws.com",
       "license": "UNLICENSED",
-      "keywords": ["crosstalk", "agent-to-agent", "messaging", "federation", "mcp"],
+      "keywords": [
+        "crosstalk",
+        "agent-to-agent",
+        "messaging",
+        "federation",
+        "mcp"
+      ],
       "category": "messaging",
       "strict": false
     }

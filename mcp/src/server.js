@@ -60,7 +60,12 @@ async function creds() {
     clientId: cognito.clientId,
     identityPoolId: cognito.identityPoolId,
     username: cognito.username,
-    password: cognito.password, // only used on first auth; refresh token takes over after
+    // #2 — forward the refresh token. The portal flow is refresh-token-ONLY (no password), so
+    // without this resolveCognitoCreds saw neither and threw "no refreshToken and no password".
+    // resolveCognitoCreds prefers refreshToken over password (REFRESH_TOKEN_AUTH); password is the
+    // legacy first-auth fallback only.
+    refreshToken: cognito.refreshToken,
+    password: cognito.password,
   });
 }
 

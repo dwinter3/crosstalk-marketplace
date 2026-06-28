@@ -12,20 +12,11 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
   if (typeof require !== "undefined") return require.apply(this, arguments);
   throw Error('Dynamic require of "' + x + '" is not supported');
 });
-var __esm = (fn, res, err) => function __init() {
-  if (err) throw err[0];
-  try {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  } catch (e5) {
-    throw err = [e5], e5;
-  }
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
 var __commonJS = (cb, mod) => function __require2() {
-  try {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  } catch (e5) {
-    throw mod = 0, e5;
-  }
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -8059,7 +8050,7 @@ var init_ListSchema = __esm({
   "node_modules/@smithy/core/dist-es/submodules/schema/schemas/ListSchema.js"() {
     init_Schema();
     ListSchema = class _ListSchema extends Schema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/lis");
+      static symbol = Symbol.for("@smithy/lis");
       name;
       traits;
       valueSchema;
@@ -8080,7 +8071,7 @@ var init_MapSchema = __esm({
   "node_modules/@smithy/core/dist-es/submodules/schema/schemas/MapSchema.js"() {
     init_Schema();
     MapSchema = class _MapSchema extends Schema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/map");
+      static symbol = Symbol.for("@smithy/map");
       name;
       traits;
       keySchema;
@@ -8103,7 +8094,7 @@ var init_OperationSchema = __esm({
   "node_modules/@smithy/core/dist-es/submodules/schema/schemas/OperationSchema.js"() {
     init_Schema();
     OperationSchema = class _OperationSchema extends Schema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/ope");
+      static symbol = Symbol.for("@smithy/ope");
       name;
       traits;
       input;
@@ -8126,7 +8117,7 @@ var init_StructureSchema = __esm({
   "node_modules/@smithy/core/dist-es/submodules/schema/schemas/StructureSchema.js"() {
     init_Schema();
     StructureSchema = class _StructureSchema extends Schema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/str");
+      static symbol = Symbol.for("@smithy/str");
       name;
       traits;
       memberNames;
@@ -8150,7 +8141,7 @@ var init_ErrorSchema = __esm({
     init_Schema();
     init_StructureSchema();
     ErrorSchema = class _ErrorSchema extends StructureSchema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/err");
+      static symbol = Symbol.for("@smithy/err");
       ctor;
       symbol = _ErrorSchema.symbol;
     };
@@ -8215,15 +8206,15 @@ var init_NormalizedSchema = __esm({
     init_deref();
     init_translateTraits();
     anno = {
-      it: /* @__PURE__ */ Symbol.for("@smithy/nor-struct-it"),
-      ns: /* @__PURE__ */ Symbol.for("@smithy/ns")
+      it: Symbol.for("@smithy/nor-struct-it"),
+      ns: Symbol.for("@smithy/ns")
     };
     simpleSchemaCacheN = [];
     simpleSchemaCacheS = {};
     NormalizedSchema = class _NormalizedSchema {
       ref;
       memberName;
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/nor");
+      static symbol = Symbol.for("@smithy/nor");
       symbol = _NormalizedSchema.symbol;
       name;
       schema;
@@ -8493,7 +8484,7 @@ var init_SimpleSchema = __esm({
   "node_modules/@smithy/core/dist-es/submodules/schema/schemas/SimpleSchema.js"() {
     init_Schema();
     SimpleSchema = class _SimpleSchema extends Schema {
-      static symbol = /* @__PURE__ */ Symbol.for("@smithy/sim");
+      static symbol = Symbol.for("@smithy/sim");
       name;
       schemaRef;
       traits;
@@ -14340,7 +14331,7 @@ var init_tslib_es6 = __esm({
       };
       return __assign.apply(this, arguments);
     };
-    __createBinding = Object.create ? (function(o3, m3, k5, k22) {
+    __createBinding = Object.create ? function(o3, m3, k5, k22) {
       if (k22 === void 0) k22 = k5;
       var desc = Object.getOwnPropertyDescriptor(m3, k5);
       if (!desc || ("get" in desc ? !m3.__esModule : desc.writable || desc.configurable)) {
@@ -14349,13 +14340,13 @@ var init_tslib_es6 = __esm({
         } };
       }
       Object.defineProperty(o3, k22, desc);
-    }) : (function(o3, m3, k5, k22) {
+    } : function(o3, m3, k5, k22) {
       if (k22 === void 0) k22 = k5;
       o3[k22] = m3[k5];
-    });
-    __setModuleDefault = Object.create ? (function(o3, v) {
+    };
+    __setModuleDefault = Object.create ? function(o3, v) {
       Object.defineProperty(o3, "default", { enumerable: true, value: v });
-    }) : function(o3, v) {
+    } : function(o3, v) {
       o3["default"] = v;
     };
     ownKeys = function(o3) {
@@ -14652,7 +14643,7 @@ var require_aws_crc32 = __commonJS({
     var index_1 = require_main2();
     var AwsCrc32 = (
       /** @class */
-      (function() {
+      function() {
         function AwsCrc322() {
           this.crc32 = new index_1.Crc32();
         }
@@ -14672,7 +14663,7 @@ var require_aws_crc32 = __commonJS({
           this.crc32 = new index_1.Crc32();
         };
         return AwsCrc322;
-      })()
+      }()
     );
     exports.AwsCrc32 = AwsCrc32;
   }
@@ -14692,7 +14683,7 @@ var require_main2 = __commonJS({
     exports.crc32 = crc32;
     var Crc323 = (
       /** @class */
-      (function() {
+      function() {
         function Crc324() {
           this.checksum = 4294967295;
         }
@@ -14718,7 +14709,7 @@ var require_main2 = __commonJS({
           return (this.checksum ^ 4294967295) >>> 0;
         };
         return Crc324;
-      })()
+      }()
     );
     exports.Crc32 = Crc323;
     var a_lookUpTable = [
@@ -15707,7 +15698,7 @@ var init_EventStreamSerde = __esm({
         const unionSchema = requestSchema.getMemberSchema(eventStreamMember);
         const serializer = this.serializer;
         const defaultContentType = this.defaultContentType;
-        const initialRequestMarker = /* @__PURE__ */ Symbol("initialRequestMarker");
+        const initialRequestMarker = Symbol("initialRequestMarker");
         const eventStreamIterable = {
           async *[Symbol.asyncIterator]() {
             if (initialRequest) {
@@ -15761,7 +15752,7 @@ var init_EventStreamSerde = __esm({
         const eventStreamMember = responseSchema.getEventStreamMember();
         const unionSchema = responseSchema.getMemberSchema(eventStreamMember);
         const memberSchemas = unionSchema.getMemberSchemas();
-        const initialResponseMarker = /* @__PURE__ */ Symbol("initialResponseMarker");
+        const initialResponseMarker = Symbol("initialResponseMarker");
         const asyncIterable = marshaller.deserialize(response.body, async (event) => {
           let unionMember = "";
           for (const key in event) {
@@ -16112,11 +16103,6 @@ var init_HttpProtocol = __esm({
         throw new Error(`@smithy/core/protocols - ${this.constructor.name} getDefaultContentType() implementation missing.`);
       }
       async deserializeHttpMessage(schema, context, response, arg4, arg5) {
-        void schema;
-        void context;
-        void response;
-        void arg4;
-        void arg5;
         return [];
       }
       getEventStreamMarshaller() {
@@ -18242,9 +18228,9 @@ var PROTECTED_KEYS, NO_GLOBAL_AWS_LAMBDA, InvokeStoreBase, InvokeStoreSingle, In
 var init_invoke_store = __esm({
   "node_modules/@aws/lambda-invoke-store/dist-es/invoke-store.js"() {
     PROTECTED_KEYS = {
-      REQUEST_ID: /* @__PURE__ */ Symbol.for("_AWS_LAMBDA_REQUEST_ID"),
-      X_RAY_TRACE_ID: /* @__PURE__ */ Symbol.for("_AWS_LAMBDA_X_RAY_TRACE_ID"),
-      TENANT_ID: /* @__PURE__ */ Symbol.for("_AWS_LAMBDA_TENANT_ID")
+      REQUEST_ID: Symbol.for("_AWS_LAMBDA_REQUEST_ID"),
+      X_RAY_TRACE_ID: Symbol.for("_AWS_LAMBDA_X_RAY_TRACE_ID"),
+      TENANT_ID: Symbol.for("_AWS_LAMBDA_TENANT_ID")
     };
     NO_GLOBAL_AWS_LAMBDA = ["true", "1"].includes(process.env?.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA ?? "");
     if (!NO_GLOBAL_AWS_LAMBDA) {
@@ -19650,10 +19636,10 @@ var init_nodeAppIdConfigOptions = __esm({
 // node_modules/bowser/es5.js
 var require_es5 = __commonJS({
   "node_modules/bowser/es5.js"(exports, module) {
-    !(function(e5, t) {
+    !function(e5, t) {
       "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.bowser = t() : e5.bowser = t();
-    })(exports, (function() {
-      return (function(e5) {
+    }(exports, function() {
+      return function(e5) {
         var t = {};
         function r5(i5) {
           if (t[i5]) return t[i5].exports;
@@ -19682,10 +19668,10 @@ var require_es5 = __commonJS({
         }, r5.o = function(e6, t2) {
           return Object.prototype.hasOwnProperty.call(e6, t2);
         }, r5.p = "", r5(r5.s = 90);
-      })({ 17: function(e5, t, r5) {
+      }({ 17: function(e5, t, r5) {
         "use strict";
         t.__esModule = true, t.default = void 0;
-        var i5 = r5(18), n3 = (function() {
+        var i5 = r5(18), n3 = function() {
           function e6() {
           }
           return e6.getFirstMatch = function(e7, t2) {
@@ -19722,9 +19708,9 @@ var require_es5 = __commonJS({
                 return;
             }
           }, e6.getMacOSVersionName = function(e7) {
-            var t2 = e7.split(".").splice(0, 2).map((function(e8) {
+            var t2 = e7.split(".").splice(0, 2).map(function(e8) {
               return parseInt(e8, 10) || 0;
-            }));
+            });
             t2.push(0);
             var r6 = t2[0], i6 = t2[1];
             if (10 === r6) switch (i6) {
@@ -19768,20 +19754,20 @@ var require_es5 = __commonJS({
                 return;
             }
           }, e6.getAndroidVersionName = function(e7) {
-            var t2 = e7.split(".").splice(0, 2).map((function(e8) {
+            var t2 = e7.split(".").splice(0, 2).map(function(e8) {
               return parseInt(e8, 10) || 0;
-            }));
+            });
             if (t2.push(0), !(1 === t2[0] && t2[1] < 5)) return 1 === t2[0] && t2[1] < 6 ? "Cupcake" : 1 === t2[0] && t2[1] >= 6 ? "Donut" : 2 === t2[0] && t2[1] < 2 ? "Eclair" : 2 === t2[0] && 2 === t2[1] ? "Froyo" : 2 === t2[0] && t2[1] > 2 ? "Gingerbread" : 3 === t2[0] ? "Honeycomb" : 4 === t2[0] && t2[1] < 1 ? "Ice Cream Sandwich" : 4 === t2[0] && t2[1] < 4 ? "Jelly Bean" : 4 === t2[0] && t2[1] >= 4 ? "KitKat" : 5 === t2[0] ? "Lollipop" : 6 === t2[0] ? "Marshmallow" : 7 === t2[0] ? "Nougat" : 8 === t2[0] ? "Oreo" : 9 === t2[0] ? "Pie" : void 0;
           }, e6.getVersionPrecision = function(e7) {
             return e7.split(".").length;
           }, e6.compareVersions = function(t2, r6, i6) {
             void 0 === i6 && (i6 = false);
-            var n4 = e6.getVersionPrecision(t2), a5 = e6.getVersionPrecision(r6), o3 = Math.max(n4, a5), s = 0, u = e6.map([t2, r6], (function(t3) {
+            var n4 = e6.getVersionPrecision(t2), a5 = e6.getVersionPrecision(r6), o3 = Math.max(n4, a5), s = 0, u = e6.map([t2, r6], function(t3) {
               var r7 = o3 - e6.getVersionPrecision(t3), i7 = t3 + new Array(r7 + 1).join(".0");
-              return e6.map(i7.split("."), (function(e7) {
+              return e6.map(i7.split("."), function(e7) {
                 return new Array(20 - e7.length).join("0") + e7;
-              })).reverse();
-            }));
+              }).reverse();
+            });
             for (i6 && (s = o3 - Math.min(n4, a5)), o3 -= 1; o3 >= s; ) {
               if (u[0][o3] > u[1][o3]) return 1;
               if (u[0][o3] === u[1][o3]) {
@@ -19806,9 +19792,9 @@ var require_es5 = __commonJS({
             if (Object.assign) return Object.assign.apply(Object, [e7].concat(a5));
             var s = function() {
               var e8 = a5[t2];
-              "object" == typeof e8 && null !== e8 && Object.keys(e8).forEach((function(t3) {
+              "object" == typeof e8 && null !== e8 && Object.keys(e8).forEach(function(t3) {
                 i6[t3] = e8[t3];
-              }));
+              });
             };
             for (t2 = 0, r6 = a5.length; t2 < r6; t2 += 1) s();
             return e7;
@@ -19817,7 +19803,7 @@ var require_es5 = __commonJS({
           }, e6.getBrowserTypeByAlias = function(e7) {
             return i5.BROWSER_MAP[e7] || "";
           }, e6;
-        })();
+        }();
         t.default = n3, e5.exports = t.default;
       }, 18: function(e5, t, r5) {
         "use strict";
@@ -19837,7 +19823,7 @@ var require_es5 = __commonJS({
             i6.enumerable = i6.enumerable || false, i6.configurable = true, "value" in i6 && (i6.writable = true), Object.defineProperty(e6, i6.key, i6);
           }
         }
-        var s = (function() {
+        var s = function() {
           function e6() {
           }
           var t2, r6, i6;
@@ -19855,7 +19841,7 @@ var require_es5 = __commonJS({
           } }, { key: "PLATFORMS_MAP", get: function() {
             return a5.PLATFORMS_MAP;
           } }], (r6 = null) && o3(t2.prototype, r6), i6 && o3(t2, i6), e6;
-        })();
+        }();
         t.default = s, e5.exports = t.default;
       }, 91: function(e5, t, r5) {
         "use strict";
@@ -19864,7 +19850,7 @@ var require_es5 = __commonJS({
         function u(e6) {
           return e6 && e6.__esModule ? e6 : { default: e6 };
         }
-        var d5 = (function() {
+        var d5 = function() {
           function e6(e7, t3, r6) {
             if (void 0 === t3 && (t3 = false), void 0 === r6 && (r6 = null), null == e7 || "" === e7) throw new Error("UserAgent parameter can't be empty");
             this._ua = e7;
@@ -19877,14 +19863,14 @@ var require_es5 = __commonJS({
           }, t2.hasBrand = function(e7) {
             if (!this._hints || !Array.isArray(this._hints.brands)) return false;
             var t3 = e7.toLowerCase();
-            return this._hints.brands.some((function(e8) {
+            return this._hints.brands.some(function(e8) {
               return e8.brand && e8.brand.toLowerCase() === t3;
-            }));
+            });
           }, t2.getBrandVersion = function(e7) {
             if (this._hints && Array.isArray(this._hints.brands)) {
-              var t3 = e7.toLowerCase(), r6 = this._hints.brands.find((function(e8) {
+              var t3 = e7.toLowerCase(), r6 = this._hints.brands.find(function(e8) {
                 return e8.brand && e8.brand.toLowerCase() === t3;
-              }));
+              });
               return r6 ? r6.version : void 0;
             }
           }, t2.getUA = function() {
@@ -19894,13 +19880,13 @@ var require_es5 = __commonJS({
           }, t2.parseBrowser = function() {
             var e7 = this;
             this.parsedResult.browser = {};
-            var t3 = s.default.find(i5.default, (function(t4) {
+            var t3 = s.default.find(i5.default, function(t4) {
               if ("function" == typeof t4.test) return t4.test(e7);
-              if (Array.isArray(t4.test)) return t4.test.some((function(t5) {
+              if (Array.isArray(t4.test)) return t4.test.some(function(t5) {
                 return e7.test(t5);
-              }));
+              });
               throw new Error("Browser's test function is not valid");
-            }));
+            });
             return t3 && (this.parsedResult.browser = t3.describe(this.getUA(), this)), this.parsedResult.browser;
           }, t2.getBrowser = function() {
             return this.parsedResult.browser ? this.parsedResult.browser : this.parseBrowser();
@@ -19913,13 +19899,13 @@ var require_es5 = __commonJS({
           }, t2.parseOS = function() {
             var e7 = this;
             this.parsedResult.os = {};
-            var t3 = s.default.find(n3.default, (function(t4) {
+            var t3 = s.default.find(n3.default, function(t4) {
               if ("function" == typeof t4.test) return t4.test(e7);
-              if (Array.isArray(t4.test)) return t4.test.some((function(t5) {
+              if (Array.isArray(t4.test)) return t4.test.some(function(t5) {
                 return e7.test(t5);
-              }));
+              });
               throw new Error("Browser's test function is not valid");
-            }));
+            });
             return t3 && (this.parsedResult.os = t3.describe(this.getUA())), this.parsedResult.os;
           }, t2.getOSName = function(e7) {
             var t3 = this.getOS().name;
@@ -19935,13 +19921,13 @@ var require_es5 = __commonJS({
           }, t2.parsePlatform = function() {
             var e7 = this;
             this.parsedResult.platform = {};
-            var t3 = s.default.find(a5.default, (function(t4) {
+            var t3 = s.default.find(a5.default, function(t4) {
               if ("function" == typeof t4.test) return t4.test(e7);
-              if (Array.isArray(t4.test)) return t4.test.some((function(t5) {
+              if (Array.isArray(t4.test)) return t4.test.some(function(t5) {
                 return e7.test(t5);
-              }));
+              });
               throw new Error("Browser's test function is not valid");
-            }));
+            });
             return t3 && (this.parsedResult.platform = t3.describe(this.getUA())), this.parsedResult.platform;
           }, t2.getEngine = function() {
             return this.parsedResult.engine ? this.parsedResult.engine : this.parseEngine();
@@ -19950,13 +19936,13 @@ var require_es5 = __commonJS({
           }, t2.parseEngine = function() {
             var e7 = this;
             this.parsedResult.engine = {};
-            var t3 = s.default.find(o3.default, (function(t4) {
+            var t3 = s.default.find(o3.default, function(t4) {
               if ("function" == typeof t4.test) return t4.test(e7);
-              if (Array.isArray(t4.test)) return t4.test.some((function(t5) {
+              if (Array.isArray(t4.test)) return t4.test.some(function(t5) {
                 return e7.test(t5);
-              }));
+              });
               throw new Error("Browser's test function is not valid");
-            }));
+            });
             return t3 && (this.parsedResult.engine = t3.describe(this.getUA())), this.parsedResult.engine;
           }, t2.parse = function() {
             return this.parseBrowser(), this.parseOS(), this.parsePlatform(), this.parseEngine(), this;
@@ -19964,29 +19950,29 @@ var require_es5 = __commonJS({
             return s.default.assign({}, this.parsedResult);
           }, t2.satisfies = function(e7) {
             var t3 = this, r6 = {}, i6 = 0, n4 = {}, a6 = 0;
-            if (Object.keys(e7).forEach((function(t4) {
+            if (Object.keys(e7).forEach(function(t4) {
               var o5 = e7[t4];
               "string" == typeof o5 ? (n4[t4] = o5, a6 += 1) : "object" == typeof o5 && (r6[t4] = o5, i6 += 1);
-            })), i6 > 0) {
-              var o4 = Object.keys(r6), u2 = s.default.find(o4, (function(e8) {
+            }), i6 > 0) {
+              var o4 = Object.keys(r6), u2 = s.default.find(o4, function(e8) {
                 return t3.isOS(e8);
-              }));
+              });
               if (u2) {
                 var d6 = this.satisfies(r6[u2]);
                 if (void 0 !== d6) return d6;
               }
-              var c5 = s.default.find(o4, (function(e8) {
+              var c5 = s.default.find(o4, function(e8) {
                 return t3.isPlatform(e8);
-              }));
+              });
               if (c5) {
                 var f5 = this.satisfies(r6[c5]);
                 if (void 0 !== f5) return f5;
               }
             }
             if (a6 > 0) {
-              var l3 = Object.keys(n4), b5 = s.default.find(l3, (function(e8) {
+              var l3 = Object.keys(n4), b5 = s.default.find(l3, function(e8) {
                 return t3.isBrowser(e8, true);
-              }));
+              });
               if (void 0 !== b5) return this.compareVersion(n4[b5]);
             }
           }, t2.isBrowser = function(e7, t3) {
@@ -20006,11 +19992,11 @@ var require_es5 = __commonJS({
             return void 0 === t3 && (t3 = false), this.isBrowser(e7, t3) || this.isOS(e7) || this.isPlatform(e7);
           }, t2.some = function(e7) {
             var t3 = this;
-            return void 0 === e7 && (e7 = []), e7.some((function(e8) {
+            return void 0 === e7 && (e7 = []), e7.some(function(e8) {
               return t3.is(e8);
-            }));
+            });
           }, e6;
-        })();
+        }();
         t.default = d5, e5.exports = t.default;
       }, 92: function(e5, t, r5) {
         "use strict";
@@ -20459,7 +20445,7 @@ var require_es5 = __commonJS({
         } }];
         t.default = o3, e5.exports = t.default;
       } });
-    }));
+    });
   }
 });
 
@@ -23698,7 +23684,7 @@ var init_cbor_types = __esm({
     extendedFloat32 = 26;
     extendedFloat64 = 27;
     minorIndefinite = 31;
-    tagSymbol = /* @__PURE__ */ Symbol("@smithy/core/cbor::tagSymbol");
+    tagSymbol = Symbol("@smithy/core/cbor::tagSymbol");
   }
 });
 
@@ -48378,7 +48364,7 @@ ZodNaN.create = (params) => {
     ...processCreateParams(params)
   });
 };
-var BRAND = /* @__PURE__ */ Symbol("zod_brand");
+var BRAND = Symbol("zod_brand");
 var ZodBranded = class extends ZodType {
   _parse(input) {
     const { ctx } = this._processInputParams(input);
@@ -48580,14 +48566,14 @@ var ostring = () => stringType().optional();
 var onumber = () => numberType().optional();
 var oboolean = () => booleanType().optional();
 var coerce = {
-  string: ((arg) => ZodString.create({ ...arg, coerce: true })),
-  number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
-  boolean: ((arg) => ZodBoolean.create({
+  string: (arg) => ZodString.create({ ...arg, coerce: true }),
+  number: (arg) => ZodNumber.create({ ...arg, coerce: true }),
+  boolean: (arg) => ZodBoolean.create({
     ...arg,
     coerce: true
-  })),
-  bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
-  date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
+  }),
+  bigint: (arg) => ZodBigInt.create({ ...arg, coerce: true }),
+  date: (arg) => ZodDate.create({ ...arg, coerce: true })
 };
 var NEVER = INVALID;
 
@@ -48638,6 +48624,7 @@ function $constructor(name, initializer3, params) {
   Object.defineProperty(_, "name", { value: name });
   return _;
 }
+var $brand = Symbol("zod_brand");
 var $ZodAsyncError = class extends Error {
   constructor() {
     super(`Encountered Promise during synchronous parse. Use .parseAsync() instead.`);
@@ -51141,6 +51128,8 @@ function en_default2() {
 }
 
 // node_modules/zod/v4/core/registries.js
+var $output = Symbol("ZodOutput");
+var $input = Symbol("ZodInput");
 var $ZodRegistry = class {
   constructor() {
     this._map = /* @__PURE__ */ new Map();
@@ -52418,10 +52407,10 @@ var ZodMiniType = /* @__PURE__ */ $constructor("ZodMiniType", (inst, def) => {
   };
   inst.clone = (_def, params) => clone(inst, _def, params);
   inst.brand = () => inst;
-  inst.register = ((reg, meta) => {
+  inst.register = (reg, meta) => {
     reg.add(inst, meta);
     return inst;
-  });
+  };
 });
 var ZodMiniObject = /* @__PURE__ */ $constructor("ZodMiniObject", (inst, def) => {
   $ZodObject.init(inst, def);
@@ -52684,10 +52673,10 @@ var ZodType2 = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
   };
   inst.clone = (def2, params) => clone(inst, def2, params);
   inst.brand = () => inst;
-  inst.register = ((reg, meta) => {
+  inst.register = (reg, meta) => {
     reg.add(inst, meta);
     return inst;
-  });
+  };
   inst.parse = (data2, params) => parse2(inst, data2, params, { callee: inst.parse });
   inst.safeParse = (data2, params) => safeParse3(inst, data2, params);
   inst.parseAsync = async (data2, params) => parseAsync2(inst, data2, params, { callee: inst.parseAsync });
@@ -54657,13 +54646,11 @@ function assertCompleteRequestPrompt(request) {
   if (request.params.ref.type !== "ref/prompt") {
     throw new TypeError(`Expected CompleteRequestPrompt, but got ${request.params.ref.type}`);
   }
-  void request;
 }
 function assertCompleteRequestResourceTemplate(request) {
   if (request.params.ref.type !== "ref/resource") {
     throw new TypeError(`Expected CompleteRequestResourceTemplate, but got ${request.params.ref.type}`);
   }
-  void request;
 }
 var CompleteResultSchema = ResultSchema.extend({
   completion: looseObject({
@@ -54816,7 +54803,7 @@ function isTerminal(status) {
 }
 
 // node_modules/zod-to-json-schema/dist/esm/Options.js
-var ignoreOverride = /* @__PURE__ */ Symbol("Let zodToJsonSchema decide on which parser to use");
+var ignoreOverride = Symbol("Let zodToJsonSchema decide on which parser to use");
 var defaultOptions = {
   name: void 0,
   $refStrategy: "root",
@@ -57792,7 +57779,7 @@ var Server = class extends Protocol {
 };
 
 // node_modules/@modelcontextprotocol/sdk/dist/esm/server/completable.js
-var COMPLETABLE_SYMBOL = /* @__PURE__ */ Symbol.for("mcp.completable");
+var COMPLETABLE_SYMBOL = Symbol.for("mcp.completable");
 function isCompletable(schema) {
   return !!schema && typeof schema === "object" && COMPLETABLE_SYMBOL in schema;
 }
@@ -58936,8 +58923,12 @@ async function creds() {
     clientId: cognito.clientId,
     identityPoolId: cognito.identityPoolId,
     username: cognito.username,
+    // #2 — forward the refresh token. The portal flow is refresh-token-ONLY (no password), so
+    // without this resolveCognitoCreds saw neither and threw "no refreshToken and no password".
+    // resolveCognitoCreds prefers refreshToken over password (REFRESH_TOKEN_AUTH); password is the
+    // legacy first-auth fallback only.
+    refreshToken: cognito.refreshToken,
     password: cognito.password
-    // only used on first auth; refresh token takes over after
   });
 }
 function notReadyResult() {
