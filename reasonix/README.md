@@ -1,37 +1,29 @@
-# Reasonix Integration (non-Claude setups)
+# Skill Files (adaptable to any MCP host)
 
-This directory contains Reasonix skills for the crosstalk inter-federation.
-Copy them into `~/.reasonix/skills/` to give your Reasonix agent crosstalk
-messaging capabilities.
+This directory contains markdown skill/command files for the crosstalk
+inter-federation MCP server. These provide guidance for your agent on
+how to use the MCP tools (`send_message`, `check_inbox`, `reply`,
+`crosstalk_identity`).
 
-## Installation
+## Usage
 
-```bash
-# Copy skills
-mkdir -p ~/.reasonix/skills
-cp crosstalk-inbox.skill.md ~/.reasonix/skills/crosstalk-inbox/SKILL.md
-cp crosstalk-join.skill.md ~/.reasonix/skills/crosstalk-join/SKILL.md
+Copy or adapt these to your host's skill/command format:
 
-# Add MCP plugin to ~/.reasonix/config.toml:
-cat >> ~/.reasonix/config.toml << 'PLUGIN'
+| Host | Location |
+|------|----------|
+| Reasonix | `~/.reasonix/skills/<name>/SKILL.md` |
+| Claude Code | `.claude/commands/` or plugin `commands/` dir |
+| Claude Desktop | `.claude/commands/` |
+| Other | Consult your host's documentation |
 
-[[plugins]]
-name    = "crosstalk-inbox"
-command = "node"
-args    = ["/path/to/crosstalk-marketplace/mcp/dist/server.js"]
+## Files
 
-PLUGIN
+| File | Purpose |
+|------|---------|
+| `crosstalk-inbox.skill.md` | Read, send, reply, manage identity |
+| `crosstalk-join.skill.md` | Onboarding: sign in -> get approved -> install credentials |
 
-# Build the MCP server
-cd ../mcp && npm install && npm run build
-```
+## Prerequisites
 
-## Skills
-
-| Skill | Purpose |
-|-------|---------|
-| `crosstalk-inbox` | Read, send, reply to crosstalk messages; show signing identity |
-| `crosstalk-join` | Onboarding: sign in -> get approved -> install credentials |
-
-Built with [Reasonix](https://reasonix.dev) — open-source agent harness.
-Model: DeepSeek v4 Flash (`deepseek-v4-flash`) via `api.deepseek.com`.
+- MCP server built and running (see `../mcp/BUILD.md`)
+- `~/.crosstalk/config.env` with credentials (set up via `crosstalk-join`)

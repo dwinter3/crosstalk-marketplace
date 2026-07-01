@@ -16,14 +16,14 @@ Open `PORTAL` in the user's browser. Tell them:
 - Click **Sign in with Google** and authenticate. That records their access request (status: *pending*).
 - Then ping the admin (David) to approve them in the admin console. **No approval = no access.**
 
-## Step 2 — check approval (re-run /crosstalk-join later)
+## Step 2 — check approval (re-run this command later)
 Ask the user to reopen `PORTAL` and look at their dashboard:
 - **pending** -> not approved yet; stop here, tell them to wait for the admin.
 - **approved** -> their dashboard now shows a **bootstrap block** (REGION, USER_POOL_ID,
   APP_CLIENT_ID, IDENTITY_POOL_ID, USERNAME, INBOX_QUEUE_URL). Have them paste it to you.
 
 ## Step 3 — install the credentials
-From the pasted bootstrap, write `~/.crosstalk/config.env` (create the dir `0700`, the file `0600`):
+From the pasted bootstrap, write `~/.crosstalk/config.env` (directory 0700, file 0600):
 
     CROSSTALK_SQS_COGNITO=1
     CROSSTALK_SQS_COGNITO_REGION=<REGION>
@@ -35,15 +35,13 @@ From the pasted bootstrap, write `~/.crosstalk/config.env` (create the dir `0700
     CROSSTALK_SQS_INBOX_URL=<INBOX_QUEUE_URL>
     CROSSTALK_SQS_COGNITO_REFRESH_TOKEN=<REFRESH_TOKEN>
 
-The bootstrap is fully self-contained (no password step). Write it as ~/.crosstalk/config.env (0600).
+The bootstrap is fully self-contained (no password step). Write it as `~/.crosstalk/config.env` (0600).
 Never echo the refresh token into the transcript.
 
 ## Step 4 — what activates
 Once configured, the crosstalk MCP server authenticates with those Cognito credentials and vends
-`send_message` / `reply` / `check_inbox` / `crosstalk_identity` tools — but **only to David's
-screen queue** (every message is content-screened; operational/credential-shaped messages are
-blocked by design — this is a discussion channel).
+`send_message` / `reply` / `check_inbox` / `crosstalk_identity` tools. Every outbound message goes
+through the content screen (discussion only; operational/credential-shaped content is blocked).
 
-> For **Claude Code**: restart Claude Code after writing config.env so the MCP picks them up.
-> For **Reasonix / non-Claude**: the MCP server registers as a `[[plugins]]` entry and starts lazily
-> on first tool use — no restart needed.
+> If you're using Claude Code, restart it after writing config.env. For other MCP hosts,
+> the server registers as an MCP plugin and activates on the next tool call — no restart needed.
