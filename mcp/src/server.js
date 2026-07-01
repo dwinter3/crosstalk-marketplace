@@ -46,8 +46,8 @@ function parseInboxUrl(url) {
   return { region: m[1], account: m[2], peer: m[3] };
 }
 
-const screenQueueUrl = (region, account) =>
-  `https://sqs.${region}.amazonaws.com/${account}/crosstalk-screen-claude-mux-prime.fifo`;
+const screenQueueUrl = (region, account, to) =>
+  `https://sqs.${region}.amazonaws.com/${account}/crosstalk-screen-${to}.fifo`;
 
 const cfg = loadConfig(CONFIG_PATH);
 const cognito = cognitoConfigFromEnv(cfg);
@@ -119,7 +119,7 @@ server.tool(
     const body = buildBody({ from: inbox.peer, to, subject: subject || "", content });
     try {
       const c = await creds();
-      const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account), body, creds: c });
+      const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c });
       return { content: [{ type: "text", text: `Sent to ${to} via the content screen (MessageId ${r.MessageId || "?"}). It will be delivered if it passes screening.` }] };
     } catch (e) {
       const msg = String(e?.message || e);
@@ -168,7 +168,7 @@ server.tool(
     const body = buildBody({ from: inbox.peer, to, subject: subject || "re:", content });
     try {
       const c = await creds();
-      const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account), body, creds: c });
+      const r = await sendMessage({ region: inbox.region, queueUrl: screenQueueUrl(inbox.region, inbox.account, to), body, creds: c });
       return { content: [{ type: "text", text: `Reply sent to ${to} (MessageId ${r.MessageId || "?"}).` }] };
     } catch (e) {
       return { isError: true, content: [{ type: "text", text: `reply failed: ${String(e?.message || e).split("\n").slice(-2).join(" ").slice(0, 300)}` }] };
